@@ -1,0 +1,57 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% master.tex                                                                                                            %
+% This file specifies things like general formatting, font sizes, page numbering, etc.                                  %
+% It also tells the compiler where to look for the .tex files for the title page, abstract, chapters, bibliography, etc %
+% See the README file for compilation information                                                                       %
+% Template written by John Groh                                                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+\documentclass[12pt,oneside]{book}
+
+\usepackage{amsmath}                 % math stuff
+\usepackage{amssymb}                 % more math stuff
+\usepackage{graphicx}                % including figures
+\usepackage[lofdepth]{subfig}        % subfigures
+\usepackage[left=1.0in,right=1.0in,%
+  top=1.0in,bottom=1.0in]{geometry}  % margin control
+\usepackage[toc,page]{appendix}      % appendix stuff
+\usepackage{times}                   % Times New Roman font
+\usepackage{color}                   % colored text
+\usepackage{float}                   % allows for [H] option with figure placing
+\usepackage[square, numbers]{natbib} % nicer citing
+\usepackage{indentfirst}             % indents first paragraph of every section
+\usepackage{setspace}                % manual line spacing control
+\usepackage{fancyhdr}                % these 5 lines are for header/footer:
+\fancypagestyle{plain}{
+\fancyhead[R]{\thepage}\fancyhead[L]{}\fancyfoot[C]{}
+\renewcommand{\headrulewidth}{0pt}}
+\pagestyle{plain}
+\setlength{\headheight}{15pt}
+\usepackage{titlesec}                % these 4 lines are for formatting chapter titles:
+\titleformat{\chapter}[display]
+{\normalfont\Huge\bfseries\centering}
+{\vspace{8ex}\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+\begin{document}
+
+% Include all the front matter.  Each command is independent of the others, so commenting out a line will cause
+% it to not be included in the compilation
+\frontmatter
+\include{frontmatter/titlepage} % see titlepage.tex
+\include{frontmatter/abstract} % etc.
+\include{frontmatter/table_of_contents}
+\include{frontmatter/list_of_figures}
+\include{frontmatter/list_of_tables}
+\include{frontmatter/acknowledgements}
+
+% same for the mainmatter
+\mainmatter
+\include{mainmatter/chapter1}
+%\include{mainmatter/chapter2} % add more of these as necessary
+
+% same for the backmatter
+\backmatter
+\include{backmatter/bibliography}
+
+\end{document}
+
