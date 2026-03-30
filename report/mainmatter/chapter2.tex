@@ -8,7 +8,7 @@
 \section{Slippi}
 Melee was originally released in 2001, with limited features. \href{https://slippi.gg/about}{Slippi}, released in June 2020, is a project designed to bring features of modern-day e-sports to Melee. These include portable replay files, complex gameplay stats, online matchmaking with improved online netcode, and more \citep{Slippi}. Not only did this make Melee more accessible through the introduction of online play, a feature missing from the original game, but Slippi also ushered in an era of data analytics surrounding Melee. Using Slippi game data, it is possible to easily analyze match data without having to manually record match results.
 
-\indent For the data used in this project, it was sourced from \href{https://chartslp.com/}{Chart.slp}, a platform that hosted a large corpus of Slippi match data. Although it is no longer maintained, it is possible to download a backup of the database, containing data for 5,594,571 different matches.
+\indent For the data used in this project, it was sourced from \href{https://chartslp.com/}{Chart.slp}, a platform that hosted a large corpus of Slippi match data. Although it is no longer maintained, it is possible to download a backup of the database, containing data for 5,594,571 different matches. This provides sufficient data for Bayesian analysis across nearly every matchup in Melee.
 
 \indent To get this data into a usable format, I developed a few Python scripts to groom the data. First, for this analysis, we only care about matchup data. The information in the database file used for match replay is not needed and consumes are large amount of space. We start by parsing just match data, such as characters, stage, winner, etc.
 

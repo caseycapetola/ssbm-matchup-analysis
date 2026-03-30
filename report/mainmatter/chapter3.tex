@@ -1,0 +1,22 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% chapter3.tex                                 %
+% Contains formatting and content of chapter 3 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Modeling the Marth-Fox Matchup}
+\newpage
+
+\section{Model 1: A Simple Binomial-Beta Conjugate}
+For the first model, we will approach it completely analytically. We will model the win rate of a character in a matchup, without factoring in stage choice. Let $\theta$ represent the probability of a character winning a given matchup. Let the likelihood of our model be represented as a binomial distribution $x_i|\theta\sim Bin(n,\theta)$, where $n$ represents the number of matches in the sample. A win for the character would be recorded as a 1 (success), while the loss would be recorded as a 0 (failure). We can specify a Beta prior generally as $\theta\sim Be(\alpha,\beta)$. A Beta prior is flexible, as it allows us to experiment with different initial beliefs for a given matchup.
+
+\indent The Beta prior can form a conjugate distribution with the posterior with respect to the Binomial likelihood. This enables us to find a fully closed-form posterior. Using existing conjugacy tables \citep{brani_vidakovic_2017} p. 341. This gives the posterior $\theta|X\sim Be(\alpha+x, \beta+n-x)$. The mean of the posterior, $\frac{\alpha+x}{(\alpha+x)+(\beta+n-x)}$, gives us the expected win rate for a character in a given matchup.
+
+\indent For the Marth-Fox matchup, assume that we are modeling Marth's win rate against Fox. Below are graphs representing the posterior matchup distribution, given different priors.
+% ADD ANALYTICS
+\indent Although this is a good exercise and a simple way to use Bayesian methods to better model matchups in Melee, there are several components not included in this initial model. First, as previously explained, stages in Melee often make a difference in a matchup. In the Marth-Fox matchup, it is argued that Final Destination is a strong choice for Marth due to him gaining access to techniques not available on stages with platforms. Thus, we are interested in also understanding character matchups by stage. Second, it is likely that not all of the observed matches were against evenly matched players. We may want to design a model that factors in player skill when trying to determine the true matchup spread.
+
+\section{Model 2: Marth-Fox Matchup by Stage}
+In competitive Melee, there are 6 tournament-legal stages. These are Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. We can utilize the same Binomial-Beta model as previously used, but we instead will separate the data by stage. Again, assume we are modeling Marth's win rate against Fox. Below are graphs representing the win rate of Marth based on the stage chosen.
+% ADD ANALYTICS
+
+\section{Model 3: Factoring in Elo}
+In newer versions of Slippi, a ranked mode was added. In this mode, players are given a rating. A higher number is indicative of a more skilled player, and vice versa. We can use this information as a factor in modeling the matchups in Melee.
