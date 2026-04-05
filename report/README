@@ -1,0 +1,94 @@
+Hi all.  I found it pretty surprising that Schreyer didn't have a LaTeX template for theses, 
+so I thought that I'd share what I made for my thesis so that everyone else doesn't have to
+reinvent the wheel.  I make no guarantees that this will compile on your machine exactly the
+way it does on mine, or that this is 100% the exact format that Schreyer is looking for.  There
+may be some tweaks you'll have to make with the margins, table of contents, etc. but hopefully
+this template will still be useful.  If you have questions, I'm tentatively listing my email
+here (johncgroh@gmail.com) - please only ask me about things specific to my template.  Please
+try and find answers to general LaTeX questions elsewhere.
+Cheers,
+John Groh
+
+-------------
+- Overview: -
+-------------
+The main file that you will have to compile is called master.tex.  It specifies things like the
+documentclass, font, font size, and margins, as well as the overall organization of the thesis.
+There are 3 main sections: frontmatter, mainmatter, and backmatter.  The frontmatter is the stuff
+that will get labed with roman numeral page numbers: the title page (which should actually be
+numberless), the abstract, the table of contents, etc.  The mainmatter is the chapters and
+appendices, and the backmatter is the bibliography, index, glossary, etc.  I've organized the
+actual files into subdirectories with the same names, although your personal organization is
+obviously up to you.  However you organize it, you will likely want to write all your content
+in files like chapter1.tex, appendixA.tex, abstract.tex, etc. to prevent a 200-page master.tex 
+file.  If you have a lot of figures, it's even possible to compile one chapter at a time to 
+save the trouble of scrolling through a 200-page pdf.
+
+--------------
+- Compiling: -
+--------------
+You can obviously use any latex compiler you prefer.  I prefer latexmk, a script that allows
+for running latex (or pdflatex, as I've configured it) the correct number of times with bibtex
+as well and has a nice "continuous preview" mode.  Most programs that involve GUIs should do all
+this stuff automatically as well.  If you are going to compile from the command line, then you'll
+probably need to do something like this:
+
+pdflatex master.tex
+bibtex master.aux
+pdflatex master.tex
+pdflatex master.tex
+
+or this:
+
+latex master
+bibtex master
+latex master
+latex master
+
+or whichever set of options you prefer.  A bunch of extra files will appear (.aux, .bbl, .blg, .fls,
+.lof, .lot, .toc, etc) which can usually be deleted safely.  It might be advisable to not delete the
+.bbl file, but I suppose this depends on how many references you have and whatnot.
+
+-------------------
+- Spell checking: -
+-------------------
+There are probably several ways to do this, especially if you use a GUI latex editor, but if you
+edit your .tex files in emacs or vim like I do, you can install and use the ispell program.  It
+has a flag (-t I think) so that it won't complain about all the latex-specific formatting marks and
+only (more or less) check the actual word content of your file.
+
+-----------------
+- Bibliography: -
+-----------------
+It's possible to just create a bibliography in your main master.tex file or to manually write a master.bbl
+file, but if you are ever going to be writing papers/theses/reports/grants/applications in LaTeX, then
+it willl probably be worth your time to start using bibtex.  You should create a refs.bib (or whatever
+you want to call it - the essential part is the file extension) file with all the references you will use 
+for your thesis.  This file can be used for every other paper you write in the future, even if you don't 
+reference every item in it each time.  Bibtex will automatically find the sources you referenced in your
+thesis, order them properly, and include only the ones you used in your final "Bibliography" section.  See
+the "Compilation" notes I wrote above for how to compile this way.
+
+-------------------------------
+- Adding your Academic Vitae: -
+-------------------------------
+Schreyer also wants a CV appended to the end of the thesis.  This could of course be done in the same
+set of files as the thesis, but I'm sure that everyone already has a pdf file of their CV ready to go and
+doesn't want to bother rewriting it.  An easy way to concatenate your CV to the end of your thesis would be
+to do something like this (in a bash shell):
+
+pdfunite master.pdf CV.pdf combined_thesis_and_cv.pdf
+
+although I'm sure there are many other ways of doing so.
+
+---------------------
+- LaTeX in general: -
+---------------------
+There are waaaay more things one can do with LaTeX than I demonstrated in this template.  There are an
+infinitude of guides, forum posts, and references online, and I think people have even written textbooks
+on the subject.  I've usually found that typing things like "latex vector symbol over letter" or "latex
+multiple images per figure" yield quick answers.
+
+
+
+
