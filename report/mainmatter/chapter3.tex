@@ -48,12 +48,12 @@ In competitive Melee, there are 6 tournament-legal stages. These are Battlefield
 \indent To determine if there is a significant effect a stage has on the Marth-Fox matchup, we can utilize a logistic regression model. This fits since the response data (a match win or loss) is binary in nature. We define our model in the following way:
 \begin{align*}
     y_i|p_i\sim\text{Bernoulli}(p_i), i=1,\dots,6\\
-    \text{logit}(p_i) = \alpha+\gamma_i\\
+    \text{logit}(p_i) = \alpha+\gamma_iy_i\\
     \alpha\sim N(0, 10)\\
     \gamma_i\sim N(0, 10)\\
     \sum\gamma_i = 0
 \end{align*}
-Where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. Below are the summary statistics for this model using a 95\% HDI credible interval:
+Where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. As a note, to speed up the model, only a subset of the full corpus of data was used (10,000 matches), which contributes to the difference in values than may have been calculated in the previous section. Below are the summary statistics for this model using a 95\% HDI credible interval:
 \\\\
 \resizebox{\textwidth}{!}{
 \begin{tabular}{lrrrrrrrrr}
@@ -79,3 +79,9 @@ The downside of this model is that it does not factor in player skill. The benef
 
 \section{Model 3: Factoring in Elo}
 In newer versions of Slippi, a ranked mode was added. In this mode, players are given a rating. A higher number is indicative of a more skilled player, and vice versa. We can use this information as a factor in modeling the matchups in Melee.
+
+Slippi follows a rating system in which players are categorized into different ``ranks'' based on their specific rating \citep{Reddit_2022}. For instance, if a player has a rating of 1450, they would have a rank of Gold 1. This distinction is important in how Elo is factored into the model.
+
+The Bradley-Terry model provides an approach in which we can model the probability of Marth player winning a match against Fox player given the strength of the players. Let $\beta_i, \beta_j$ represent the perceived ``strength'' of the Marth and Fox player respectively, in terms of Elo. The log-odds of the Marth player beating the Fox player is equal to the difference of $\beta_i$ and $\beta_j$\citep{Stanford_2016}. Through strategic ordering of parameters, we can also introduce other effects that can factor into the outcome of a game between two players, including the previously explored ``matchup'' factor and ``stage'' factor. Thus, we can naturally extend the previously defined model for Marth's matchup against Fox in a vacuum, to now model the probability of a specific Marth player winning against a Fox player.
+
+Unfortunately, the data sampled for this project did not have access to player Elo data. To prove out this new model, Elo data was synthesized based on the existing range of Slippi ratings. To normalize the Elo data into relative skill differences, I opted to divide the difference in player elo by 300. This aligns with the approximate elo difference between major ranks (i.e. between Silver and Gold, Gold and Platinum, etc.) across Slippi's ranked system.
