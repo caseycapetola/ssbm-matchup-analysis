@@ -53,7 +53,29 @@ In competitive Melee, there are 6 tournament-legal stages. These are Battlefield
     \gamma_i\sim N(0, 10)\\
     \sum\gamma_i = 0
 \end{align*}
-Where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability.
+Where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. Below are the summary statistics for this model using a 95\% HDI credible interval:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+alpha & -0.284 & 0.020 & -0.321 & -0.243 & 0.000 & 0.000 & 5294.000 & 3306.000 & 1.000 \\
+gamma[YOSHIS\_STORY] & 0.121 & 0.045 & 0.036 & 0.210 & 0.001 & 0.001 & 5943.000 & 2928.000 & 1.000 \\
+gamma[FOUNTAIN\_OF\_DREAMS] & -0.019 & 0.046 & -0.107 & 0.070 & 0.001 & 0.001 & 5386.000 & 3267.000 & 1.000 \\
+gamma[FINAL\_DESTINATION] & 0.069 & 0.046 & -0.019 & 0.163 & 0.001 & 0.001 & 6276.000 & 2805.000 & 1.000 \\
+gamma[POKEMON\_STADIUM] & -0.081 & 0.043 & -0.162 & 0.004 & 0.001 & 0.001 & 5336.000 & 2909.000 & 1.000 \\
+gamma[BATTLEFIELD] & -0.019 & 0.044 & -0.108 & 0.060 & 0.001 & 0.001 & 6070.000 & 3172.000 & 1.000 \\
+gamma[DREAMLAND] & -0.070 & 0.046 & -0.161 & 0.017 & 0.001 & 0.001 & 5253.000 & 3418.000 & 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+Looking at this data, we see that the credible for $\alpha$ does not cross 0. This implies that, disregarding any additional stage factor, Marth is likely to have a losing matchup against Fox. Specifically, when converting the log-odds to a probability, we estimate the base probability of Marth winning against Fox to be approximately 42.9\%. This contradicts both the assumption that the matchup is even, or the possibility that the matchup is in Marth's favor.
+
+Analyzing the $\gamma_i$ values, we can analyze what stages could be beneficial for Marth. Yoshi's Story appears to be the only stage where we can conclusively determine (given the 95\% HDI credible interval) that it is more likely that Marth will win on this stage. While not conclusive, Final Destination appears to be in Marth's favor. Similarly, Dream Land and Pokemon Stadium appear to lean in Fox's favor, although this is also not conclusive. Battlefield and Fountain of Dreams appear to be relatively even for both characters. Given this data, a Marth player's choice for stage bans or selections can be backed by concrete statistics.
+
+The downside of this model is that it does not factor in player skill. The benefits of certain stages are emphasized more when a player has the necessary skill to exploit certain techniques. Additionally, it is possible that the matchup winrate in general may shift depending on the skill level of players. The next model will propose an approach to incorporate Slippi ratings into our model.
 
 \section{Model 3: Factoring in Elo}
 In newer versions of Slippi, a ranked mode was added. In this mode, players are given a rating. A higher number is indicative of a more skilled player, and vice versa. We can use this information as a factor in modeling the matchups in Melee.
