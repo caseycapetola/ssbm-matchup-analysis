@@ -84,4 +84,37 @@ Slippi follows a rating system in which players are categorized into different `
 
 The Bradley-Terry model provides an approach in which we can model the probability of Marth player winning a match against Fox player given the strength of the players. Let $\beta_i, \beta_j$ represent the perceived ``strength'' of the Marth and Fox player respectively, in terms of Elo. The log-odds of the Marth player beating the Fox player is equal to the difference of $\beta_i$ and $\beta_j$\citep{Stanford_2016}. Through strategic ordering of parameters, we can also introduce other effects that can factor into the outcome of a game between two players, including the previously explored ``matchup'' factor and ``stage'' factor. Thus, we can naturally extend the previously defined model for Marth's matchup against Fox in a vacuum, to now model the probability of a specific Marth player winning against a Fox player.
 
-Unfortunately, the data sampled for this project did not have access to player Elo data. To prove out this new model, Elo data was synthesized based on the existing range of Slippi ratings. To normalize the Elo data into relative skill differences, I opted to divide the difference in player elo by 300. This aligns with the approximate elo difference between major ranks (i.e. between Silver and Gold, Gold and Platinum, etc.) across Slippi's ranked system.
+Unfortunately, the data sampled for this project did not have access to player Elo data. To prove out this new model, Elo data was synthesized based on the existing range of Slippi ratings. To normalize the Elo data into relative skill differences, I opted to divide the difference in player elo by 300. This aligns with the approximate elo difference between major ranks (i.e. between Silver and Gold, Gold and Platinum, etc.) across Slippi's ranked system. Thus, for the modified Bradley-Terry model, we use a scale factor of 300 and a base of $e$, slightly different than the traditional setup for elo in chess, which utilizes
+a scale factor of 400 and base of 10 \citep{Beaume}.
+
+More formally, we can define our new model in the following way:
+\begin{align*}
+    y_i|p_i\sim\text{Bernoulli}(p_i), i=1,\dots,6\\
+    \text{logit}(p_i) = \beta(\frac{\epsilon_m-\epsilon_f}{300})+\alpha+\gamma_iy_i\\
+    \alpha\sim N(0, 10)\\
+    \beta\sim N(0, 10)\\
+    \gamma_i\sim N(0, 10)\\
+    \sum\gamma_i = 0
+\end{align*}
+Where $\alpha$ and $\gamma_i$ are the same as previously defined, $\epsilon_m,\epsilon_f$ is the Slippi rating of the Marth and Fox player respectively, and $\beta$ represents the effect elo plays into the matchup. Running this new model once more using the same data produces the following results:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+alpha & -0.284 & 0.020 & -0.322 & -0.244 & 0.000 & 0.000 & 6584.000 & 2632.000 & 1.000 \\
+beta & 0.002 & 0.010 & -0.018 & 0.022 & 0.000 & 0.000 & 6185.000 & 2853.000 & 1.000 \\
+gamma[YOSHIS\_STORY] & 0.120 & 0.042 & 0.041 & 0.203 & 0.001 & 0.001 & 5576.000 & 2730.000 & 1.010 \\
+gamma[FOUNTAIN\_OF\_DREAMS] & -0.018 & 0.047 & -0.107 & 0.073 & 0.001 & 0.001 & 7786.000 & 3162.000 & 1.000 \\
+gamma[FINAL\_DESTINATION] & 0.068 & 0.047 & -0.023 & 0.156 & 0.001 & 0.001 & 7329.000 & 2771.000 & 1.000 \\
+gamma[POKEMON\_STADIUM] & -0.081 & 0.044 & -0.172 & 0.001 & 0.001 & 0.001 & 6830.000 & 2919.000 & 1.000 \\
+gamma[BATTLEFIELD] & -0.019 & 0.043 & -0.106 & 0.065 & 0.001 & 0.001 & 7269.000 & 3220.000 & 1.000 \\
+gamma[DREAMLAND] & -0.070 & 0.047 & -0.156 & 0.023 & 0.001 & 0.001 & 7406.000 & 3410.000 & 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+Looking at the data for $\beta$, it appears that a difference in Slippi rating has little impact on the projected matchup. This is almost certainly due to the elo data being randomly generated; in fact, it likely serves as an example to show that the model is recognizing rating as a ``random'' factor of sorts. Given real, live data, I would expect this parameter to have the potential of changing.
+
+\indent For the $\alpha$ and $\gamma_i$ parameters, little has changed, also due to $\beta$ having little impact on the matchup. While the matchup factor would likely remain the same, I would expect the stage effects to potentially diverge as skill difference is accounted for.
