@@ -82,6 +82,45 @@ In newer versions of Slippi, a ranked mode was added. In this mode, players are 
 
 Slippi follows a rating system in which players are categorized into different ``ranks'' based on their specific rating \citep{Reddit_2022}. For instance, if a player has a rating of 1450, they would have a rank of Gold 1. This distinction is important in how Elo is factored into the model.
 
+\begin{figure}[H]
+\center\includegraphics[width=0.2\textwidth]{figures/slippi_elo_brackets.png}
+\caption[Rating cutoffs for each rank in Slippi.]{Rating cutoffs for each rank in Slippi.}
+\label{fig:slippi_elo_brackets}
+\end{figure}
+
+% \begin{table}[H]
+% \centering\onehalfspacing
+% \vline
+% \begin{tabular}{c c c}
+% \hline
+% \textbf{Rank} & \vline & \textbf{ELO Required}\\
+% \hline
+% Bronze 1 & \vline & 0\\
+% Bronze 2 & \vline & 766\\
+% Bronze 3 & \vline & 914\\
+% Silver 1 & \vline & 1055\\
+% Silver 2 & \vline & 1189\\
+% Silver 3 & \vline & 1316\\
+% Gold 1 & \vline & 1436\\
+% Gold 2 & \vline & 1549\\
+% Gold 3 & \vline & 1654\\
+% Plat 1 & \vline & 1752\\
+% Plat 2 & \vline & 1843\\
+% Plat 3 & \vline & 1928\\
+% Dia 1 & \vline & 2004\\
+% Dia 2 & \vline & 2074\\
+% Dia 3 & \vline & 2137\\
+% Master 1 & \vline & 2192\\
+% Master 2 & \vline & 2275\\
+% Master 3 & \vline & 2350\\
+% Grandmaster & \vline & Top of Region AND $>2192$\\
+% \hline
+% \end{tabular}\vline
+% \captionsetup{width=0.4\textwidth}
+% \caption[Rank and ELO requirements]{Rank and ELO requirements}
+% \label{tab:elo_ranks}
+% \end{table}
+
 The Bradley-Terry model provides an approach in which we can model the probability of Marth player winning a match against Fox player given the strength of the players. Let $\beta_i, \beta_j$ represent the perceived ``strength'' of the Marth and Fox player respectively, in terms of Elo. The log-odds of the Marth player beating the Fox player is equal to the difference of $\beta_i$ and $\beta_j$\citep{Stanford_2016}. Through strategic ordering of parameters, we can also introduce other effects that can factor into the outcome of a game between two players, including the previously explored ``matchup'' factor and ``stage'' factor. Thus, we can naturally extend the previously defined model for Marth's matchup against Fox in a vacuum, to now model the probability of a specific Marth player winning against a Fox player.
 
 Unfortunately, the data sampled for this project did not have access to player Elo data. To prove out this new model, Elo data was synthesized based on the existing range of Slippi ratings. To normalize the Elo data into relative skill differences, I opted to divide the difference in player elo by 300. This aligns with the approximate elo difference between major ranks (i.e. between Silver and Gold, Gold and Platinum, etc.) across Slippi's ranked system. Thus, for the modified Bradley-Terry model, we use a scale factor of 300 and a base of $e$, slightly different than the traditional setup for elo in chess, which utilizes
