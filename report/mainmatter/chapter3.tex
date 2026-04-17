@@ -43,7 +43,7 @@ For the first model, we will approach it completely analytically. We will model 
 \indent Although this is a good exercise and a simple way to use Bayesian methods to better model matchups in Melee, there are several components not included in this initial model. First, as previously explained, stages in Melee often make a difference in a matchup. In the Marth-Fox matchup, it is argued that Final Destination is a strong choice for Marth due to him gaining access to techniques not available on stages with platforms. Thus, we are interested in also understanding character matchups by stage. Second, it is likely that not all of the observed matches were against evenly matched players. We may want to design a model that factors in player skill when trying to determine the true matchup spread.
 
 \section{Model 2: Marth-Fox Matchup by Stage}
-In competitive Melee, there are 6 tournament-legal stages. These are Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. In competitive Melee, players will go through a process known as ``stage striking'', in which players take turns removing a stage from being selected until there is only one remaining \citep{SmashWiki_StageStriking}. It is important for a player to understand how their character performs on each stage in a given matchup.
+In competitive Melee, there are 6 tournament-legal stages. These are Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. In competitive Melee, players will go through a process known as ``stage striking'', in which players take turns removing a stage from being selected until there is only one remaining \citep{SmashWiki_StageStriking}. It is important for a player to understand how their character performs on each stage in a given matchup when deciding which stages to strike.
 
 \indent To determine if there is a significant effect a stage has on the Marth-Fox matchup, we can utilize a logistic regression model. This fits since the response data (a match win or loss) is binary in nature. We define our model in the following way:
 \begin{align*}
@@ -74,6 +74,22 @@ gamma[DREAMLAND] & -0.070 & 0.046 & -0.161 & 0.017 & 0.001 & 0.001 & 5253.000 & 
 Looking at this data, we see that the credible for $\alpha$ does not cross 0. This implies that, disregarding any additional stage factor, Marth is likely to have a losing matchup against Fox. Specifically, when converting the log-odds to a probability, we estimate the base probability of Marth winning against Fox to be approximately 42.9\%. This contradicts both the assumption that the matchup is even, or the possibility that the matchup is in Marth's favor.
 
 Analyzing the $\gamma_i$ values, we can analyze what stages could be beneficial for Marth. Yoshi's Story appears to be the only stage where we can conclusively determine (given the 95\% HDI credible interval) that it is more likely that Marth will win on this stage. While not conclusive, Final Destination appears to be in Marth's favor. Similarly, Dream Land and Pokemon Stadium appear to lean in Fox's favor, although this is also not conclusive. Battlefield and Fountain of Dreams appear to be relatively even for both characters. Given this data, a Marth player's choice for stage bans or selections can be backed by concrete statistics.
+
+We also can conduct a hypothesis test to see if the belief that the matchup being 60/40 in Marth's favor holds any merit. We can do this by checking if $\text{invlogit}(\alpha) >= 0.6$ for each sampled $\alpha$ in the chain. When performing this test, we get the following output:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+h1 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & NaN & 4000.000 & 4000.000 & NaN \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+It can be seen that in the sampling there were no samples that fit this criteria. Thus, this is a strong indication that the belief that the Marth Fox matchup is 60/40 in Marth's favor is not supported at all by this model.
+
+\textit{Note: When conducting the hypothesis test, arviz returned runtime warnings due to attempting to divide by zero. This is likely due to the hypothesis test returning no viable samples given the constraint $\text{invlogit}\alpha >= 0.6$. These warnings are safe to ignore in this case.}
 
 The downside of this model is that it does not factor in player skill. The benefits of certain stages are emphasized more when a player has the necessary skill to exploit certain techniques. Additionally, it is possible that the matchup winrate in general may shift depending on the skill level of players. The next model will propose an approach to incorporate Slippi ratings into our model.
 
