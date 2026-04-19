@@ -8,15 +8,170 @@
 \section{Model 1: A Simple Binomial-Beta Conjugate}
 For the first model, we will approach it completely analytically. We will model the win rate of a character in a matchup, without factoring in stage choice. Let $\theta$ represent the probability of a character winning a given matchup. Let the likelihood of our model be represented as a binomial distribution $x_i|\theta\sim Bin(n,\theta)$, where $n$ represents the number of matches in the sample. A win for the character would be recorded as a 1 (success), while the loss would be recorded as a 0 (failure). We can specify a Beta prior generally as $\theta\sim Be(\alpha,\beta)$. A Beta prior is flexible, as it allows us to experiment with different initial beliefs for a given matchup.
 
-\indent The Beta prior can form a conjugate distribution with the posterior with respect to the Binomial likelihood. This enables us to find a fully closed-form posterior. Using existing conjugacy tables \citep{brani_vidakovic_2017} p. 341. This gives the posterior $\theta|X\sim Be(\alpha+x, \beta+n-x)$. The mean of the posterior, $\frac{\alpha+x}{(\alpha+x)+(\beta+n-x)}$, gives us the expected win rate for a character in a given matchup.
+\indent The Beta prior can form a conjugate distribution with the posterior with respect to the Binomial likelihood. This enables us to find a fully closed-form posterior. Using existing conjugacy tables \citep{brani_vidakovic_2017} p. 341 gives the posterior $\theta|X\sim Be(\alpha+x, \beta+n-x)$. The mean of the posterior, $\frac{\alpha+x}{(\alpha+x)+(\beta+n-x)}$, gives us the expected win rate for a character in a given matchup.
 
-\indent For the Marth-Fox matchup, assume that we are modeling Marth's win rate against Fox. Below are graphs representing the posterior matchup distribution, given different priors.
-% ADD ANALYTICS
+\indent For the Marth-Fox matchup, assume that we are modeling Marth's win rate against Fox. Below are graphs representing the posterior matchup distribution, given the extracted Slippi match data and varying priors.
+% Blah blah blah.  Here is an example of how to include and cite a figure: see Figure~\ref{fig:example_figure}
+\begin{figure}[H]
+\center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_strength.png}
+\caption[Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths.]{Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths.}
+\label{fig:posterior_beta_priors_varying_strength}
+\end{figure}
+\begin{figure}[H]
+\center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_matchup_winrate.png}
+\caption[Modeling the Marth-Fox matchup with varying, weak priors.]{Modeling the Marth-Fox matchup with varying, weak priors.}
+\label{fig:posterior_beta_priors_varying_matchup_winrate}
+\end{figure}
+\begin{figure}[H]
+\center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_matchup_winrate_and_strength.png}
+\caption[Modeling the Marth-Fox matchup with varying, strong priors.]{Modeling the Marth-Fox matchup with varying, strong priors.}
+\label{fig:posterior_beta_priors_varying_matchup_winrate_and_strength}
+\end{figure}
+\indent As shown in these graphs, the expected win rate of Marth against Fox is greatly impacted by the observed data ($\approx$270,000 matches observed). This makes sense because the posterior distribution parameters will be greatly influenced by the likelihood. Thus, in the case of a large data sample like this, the impact of the priors, regardless of perceived strength, is rendered nearly meaningless due to the sheer amount of observed data. However, for cases of uncommon matchups, where there may not be a lot of available data, the Bayesian model will allow our prior distribution to be incorporated into the posterior to a greater degree. Below are graphs of the posterior when, in a hypothetical sample of 10 Marth-Fox matches, Marth wins 8 of them.
+\begin{figure}[H]
+\center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_sample_data.png}
+\caption[Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths using sample data.]{Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths using sample data.}
+\label{fig:posterior_beta_priors_sample_data}
+\end{figure}
+\begin{figure}[H]
+\center\includegraphics[width=0.8\textwidth]{figures/posterior_different_beta_priors_sample_data.png}
+\caption[Modeling a different Marth-Fox expected win rates given varying matchup priors of similar strength using sample data.]{Modeling a different Marth-Fox expected win rates given varying matchup priors of similar stregth using sample data.}
+\label{fig:posterior_different_beta_priors_sample_data}
+\end{figure}
+\indent Looking at the above figures, it is more evident how changing a prior's strength or shape will affect the posterior distribution. Again, in the case of Melee, given $n=26$ characters, there are $\frac{n(n+1)}{2}=\frac{26\cdot27}{2}=351$ total unique matchups. By leveraging a Bayesian approach, we can more accurately model matchup probabilities for characters with significantly lower usage in competitive settings.
+
 \indent Although this is a good exercise and a simple way to use Bayesian methods to better model matchups in Melee, there are several components not included in this initial model. First, as previously explained, stages in Melee often make a difference in a matchup. In the Marth-Fox matchup, it is argued that Final Destination is a strong choice for Marth due to him gaining access to techniques not available on stages with platforms. Thus, we are interested in also understanding character matchups by stage. Second, it is likely that not all of the observed matches were against evenly matched players. We may want to design a model that factors in player skill when trying to determine the true matchup spread.
 
 \section{Model 2: Marth-Fox Matchup by Stage}
-In competitive Melee, there are 6 tournament-legal stages. These are Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. We can utilize the same Binomial-Beta model as previously used, but we instead will separate the data by stage. Again, assume we are modeling Marth's win rate against Fox. Below are graphs representing the win rate of Marth based on the stage chosen.
-% ADD ANALYTICS
+In competitive Melee, there are 6 tournament-legal stages: Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. In competitive Melee, before a set begins, players will go through a process known as ``stage striking'', in which players take turns removing a stage from being selected until there is only one remaining \citep{SmashWiki_StageStriking}. It is important for a player to understand how their character performs on each stage in a given matchup when deciding which stages to strike.
+
+\indent To determine if there is a significant effect a stage has on the Marth-Fox matchup, we can utilize a logistic regression model. This fits since the response data (a match win or loss) is binary in nature. We define our model as
+\begin{align*}
+    y_i|p_i\sim\text{Bernoulli}(p_i), i=1,\dots,6\\
+    \text{logit}(p_i) = \alpha+\gamma_iy_i\\
+    \alpha\sim N(0, 10)\\
+    \gamma_i\sim N(0, 10)\\
+    \sum\gamma_i = 0
+\end{align*}
+where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. As a note, to speed up the model, only a subset of the full corpus of data was used (10,000 matches), which contributes to the difference in values than may have been calculated in the previous section. Below are the summary statistics for this model using a 95\% HDI credible interval:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+alpha & -0.284 & 0.020 & -0.321 & -0.243 & 0.000 & 0.000 & 5294.000 & 3306.000 & 1.000 \\
+gamma[YOSHIS\_STORY] & 0.121 & 0.045 & 0.036 & 0.210 & 0.001 & 0.001 & 5943.000 & 2928.000 & 1.000 \\
+gamma[FOUNTAIN\_OF\_DREAMS] & -0.019 & 0.046 & -0.107 & 0.070 & 0.001 & 0.001 & 5386.000 & 3267.000 & 1.000 \\
+gamma[FINAL\_DESTINATION] & 0.069 & 0.046 & -0.019 & 0.163 & 0.001 & 0.001 & 6276.000 & 2805.000 & 1.000 \\
+gamma[POKEMON\_STADIUM] & -0.081 & 0.043 & -0.162 & 0.004 & 0.001 & 0.001 & 5336.000 & 2909.000 & 1.000 \\
+gamma[BATTLEFIELD] & -0.019 & 0.044 & -0.108 & 0.060 & 0.001 & 0.001 & 6070.000 & 3172.000 & 1.000 \\
+gamma[DREAMLAND] & -0.070 & 0.046 & -0.161 & 0.017 & 0.001 & 0.001 & 5253.000 & 3418.000 & 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+Looking at this data, we see that the credible interval for $\alpha$ does not cross 0. This implies that, disregarding any additional stage factor, Marth is likely to have a losing matchup against Fox. Specifically, when converting the log-odds to a probability, we estimate the base probability of Marth winning against Fox to be approximately 42.9\%. This contradicts both the assumption that the matchup is even, or the possibility that the matchup is in Marth's favor.
+
+Analyzing the $\gamma_i$ values, we can determine what stages could be beneficial for Marth. Yoshi's Story appears to be the only stage in which we can conclusively determine (given the 95\% HDI credible interval) that it is more likely that Marth will win. While not conclusive, Final Destination appears to be in Marth's favor. Similarly, Dream Land and Pokemon Stadium appear to lean in Fox's favor, although this is also not conclusive. Battlefield and Fountain of Dreams appear to be relatively even for both characters. Given this data, a Marth player's choice for stage bans or selections can be more strongly statistically supported.
+
+We also can conduct a hypothesis test to see if the belief that the matchup being 60/40 in Marth's favor holds any merit. We can do this by checking if $\text{invlogit}(\alpha) >= 0.6$ for each sampled $\alpha$ in the chain. The resulting data of this hypothesis test is as follows:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+h1 & 0.000 & 0.000 & 0.000 & 0.000 & 0.000 & NaN & 4000.000 & 4000.000 & NaN \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+It can be seen that in the sampling there were no samples that fit this criteria. Thus, this is a strong indication that the belief that the Marth Fox matchup is 60/40 in Marth's favor is not supported at all by this model.
+
+\textit{Note: When conducting the hypothesis test, arviz returned runtime warnings due to attempting to divide by zero, resulting in NaN values for mcse\_sd and r\_hat. This is likely due to the hypothesis test returning no viable samples given the constraint $invlogit(\alpha) >= 0.6$. These warnings are safe to ignore in this case.}
+
+The downside of this model is that it does not factor in player skill. The benefits of certain stages may be emphasized more when a player has the necessary skill to exploit certain techniques. Additionally, it is possible that the matchup winrate in general may shift depending on the skill level of players. The next model will propose an approach to incorporate Slippi ratings into our model.
 
 \section{Model 3: Factoring in Elo}
 In newer versions of Slippi, a ranked mode was added. In this mode, players are given a rating. A higher number is indicative of a more skilled player, and vice versa. We can use this information as a factor in modeling the matchups in Melee.
+
+Slippi follows a rating system in which players are categorized into different ``ranks'' based on their specific rating \citep{Reddit_2022}. For instance, if a player has a rating of 1450, they would have a rank of Gold 1. This distinction is important in how Elo is factored into the model.
+
+\begin{figure}[H]
+\center\includegraphics[width=0.2\textwidth]{figures/slippi_elo_brackets.png}
+\caption[Rating cutoffs for each rank in Slippi.]{Rating cutoffs for each rank in Slippi.}
+\label{fig:slippi_elo_brackets}
+\end{figure}
+
+% \begin{table}[H]
+% \centering\onehalfspacing
+% \vline
+% \begin{tabular}{c c c}
+% \hline
+% \textbf{Rank} & \vline & \textbf{ELO Required}\\
+% \hline
+% Bronze 1 & \vline & 0\\
+% Bronze 2 & \vline & 766\\
+% Bronze 3 & \vline & 914\\
+% Silver 1 & \vline & 1055\\
+% Silver 2 & \vline & 1189\\
+% Silver 3 & \vline & 1316\\
+% Gold 1 & \vline & 1436\\
+% Gold 2 & \vline & 1549\\
+% Gold 3 & \vline & 1654\\
+% Plat 1 & \vline & 1752\\
+% Plat 2 & \vline & 1843\\
+% Plat 3 & \vline & 1928\\
+% Dia 1 & \vline & 2004\\
+% Dia 2 & \vline & 2074\\
+% Dia 3 & \vline & 2137\\
+% Master 1 & \vline & 2192\\
+% Master 2 & \vline & 2275\\
+% Master 3 & \vline & 2350\\
+% Grandmaster & \vline & Top of Region AND $>2192$\\
+% \hline
+% \end{tabular}\vline
+% \captionsetup{width=0.4\textwidth}
+% \caption[Rank and ELO requirements]{Rank and ELO requirements}
+% \label{tab:elo_ranks}
+% \end{table}
+
+The Bradley-Terry model provides an approach in which we can model the probability of a Marth player winning a match against a Fox player given the strength of the players. Let $\beta_i, \beta_j$ represent the perceived ``strength'' of the Marth and Fox player respectively, in terms of rating. The log-odds of the Marth player beating the Fox player is equal to the difference of $\beta_i$ and $\beta_j$\citep{Stanford_2016}. Through strategic ordering of parameters, we can also introduce other effects that can factor into the outcome of a game between two players, including the previously explored ``matchup'' factor and ``stage'' factor. Thus, we can naturally extend the previously defined model for Marth's matchup against Fox in a vacuum, to now model the probability of a specific Marth player winning against a Fox player given their Slippi ratings.
+
+Unfortunately, the data sampled for this project did not have access to player rating data. To prove out this new model, rating data was synthesized based on the existing range of Slippi ratings. To normalize the rating data into relative skill differences, I opted to divide the difference in player rating by 300. This aligns with the approximate rating difference between major ranks (i.e. between Silver and Gold, Gold and Platinum, etc.) across Slippi's ranked system. Thus, for the modified Bradley-Terry model, we use a scale factor of 300 and a base of $e$, slightly different than the traditional setup for Elo in chess, which utilizes
+a scale factor of 400 and base of 10 \citep{Beaume}.
+
+More formally, we can define our new model in the following way:
+\begin{align*}
+    y_i|p_i\sim\text{Bernoulli}(p_i), i=1,\dots,6\\
+    \text{logit}(p_i) = \beta(\frac{\epsilon_m-\epsilon_f}{300})+\alpha+\gamma_iy_i\\
+    \alpha\sim N(0, 10)\\
+    \beta\sim N(0, 10)\\
+    \gamma_i\sim N(0, 10)\\
+    \sum\gamma_i = 0
+\end{align*}
+Where $\alpha$ and $\gamma_i$ are the same as previously defined, $\epsilon_m,\epsilon_f$ is the Slippi rating of the Marth and Fox player respectively, and $\beta$ represents the effect rating differences has on the matchup. Running this new model using the same data from Section 3.2 produces the following results:
+\\\\
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+ & mean & sd & hdi\_2.5\% & hdi\_97.5\% & mcse\_mean & mcse\_sd & ess\_bulk & ess\_tail & r\_hat \\
+\midrule
+alpha & -0.284 & 0.020 & -0.322 & -0.244 & 0.000 & 0.000 & 6584.000 & 2632.000 & 1.000 \\
+beta & 0.002 & 0.010 & -0.018 & 0.022 & 0.000 & 0.000 & 6185.000 & 2853.000 & 1.000 \\
+gamma[YOSHIS\_STORY] & 0.120 & 0.042 & 0.041 & 0.203 & 0.001 & 0.001 & 5576.000 & 2730.000 & 1.010 \\
+gamma[FOUNTAIN\_OF\_DREAMS] & -0.018 & 0.047 & -0.107 & 0.073 & 0.001 & 0.001 & 7786.000 & 3162.000 & 1.000 \\
+gamma[FINAL\_DESTINATION] & 0.068 & 0.047 & -0.023 & 0.156 & 0.001 & 0.001 & 7329.000 & 2771.000 & 1.000 \\
+gamma[POKEMON\_STADIUM] & -0.081 & 0.044 & -0.172 & 0.001 & 0.001 & 0.001 & 6830.000 & 2919.000 & 1.000 \\
+gamma[BATTLEFIELD] & -0.019 & 0.043 & -0.106 & 0.065 & 0.001 & 0.001 & 7269.000 & 3220.000 & 1.000 \\
+gamma[DREAMLAND] & -0.070 & 0.047 & -0.156 & 0.023 & 0.001 & 0.001 & 7406.000 & 3410.000 & 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\\\\
+Looking at the data for $\beta$, it appears that a difference in Slippi rating has little impact on the projected matchup. This is almost certainly due to the elo data being randomly generated; in fact, it likely serves as an example to show that the model is recognizing rating as a ``random'' factor of sorts. Given real, live data, I would expect this parameter to have the potential of changing.
+
+\indent For the $\alpha$ and $\gamma_i$ parameters, little has changed, also likely due to $\beta$ having little impact on the matchup. While the matchup factor would likely remain the same, I would expect the stage effects to potentially diverge as skill difference is accounted for.
+
+\indent Although there is no substantial conclusion on player ratings impacting the Marth-Fox matchup in this example, this model provides the foundation to perform similar analysis in the future if match data containing player ratings is available.

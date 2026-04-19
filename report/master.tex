@@ -23,6 +23,7 @@
 \usepackage{setspace}                % manual line spacing control
 \usepackage{fancyhdr}                % these 5 lines are for header/footer:
 \usepackage{url}
+\usepackage{booktabs}
 \fancypagestyle{plain}{
 \fancyhead[R]{\thepage}\fancyhead[L]{}\fancyfoot[C]{}
 \renewcommand{\headrulewidth}{0pt}}
@@ -40,7 +41,7 @@
 % it to not be included in the compilation
 \frontmatter
 \include{frontmatter/titlepage} % see titlepage.tex
-\include{frontmatter/abstract} % etc.
+% \include{frontmatter/abstract} % etc.
 % \include{frontmatter/table_of_contents}
 % \include{frontmatter/list_of_figures}
 % \include{frontmatter/list_of_tables}
@@ -51,6 +52,7 @@
 \include{mainmatter/chapter1}
 \include{mainmatter/chapter2}
 \include{mainmatter/chapter3}
+\include{mainmatter/chapter4}
 
 % same for the backmatter
 \backmatter
