@@ -14,23 +14,23 @@ For the first model, we will approach it completely analytically. We will model 
 % Blah blah blah.  Here is an example of how to include and cite a figure: see Figure~\ref{fig:example_figure}
 \begin{figure}[H]
 \center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_strength.png}
-\caption[Modeling a 50/50 Marth-Fox matchup prior with varying strengths.]{Modeling a Marth-Fox even (50/50) matchup prior with varying strengths.}
+\caption[Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths.]{Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths.}
 \label{fig:posterior_beta_priors_varying_strength}
 \end{figure}
 \begin{figure}[H]
 \center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_matchup_winrate.png}
-\caption[Modeling a different Marth-Fox expected win rates with weak priors.]{Modeling a different Marth-Fox expected win rates with weak priors.}
+\caption[Modeling the Marth-Fox matchup with varying, weak priors.]{Modeling the Marth-Fox matchup with varying, weak priors.}
 \label{fig:posterior_beta_priors_varying_matchup_winrate}
 \end{figure}
 \begin{figure}[H]
 \center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_varying_matchup_winrate_and_strength.png}
-\caption[Modeling a different Marth-Fox expected win rates with strong priors.]{Modeling a different Marth-Fox expected win rates with strong priors.}
+\caption[Modeling the Marth-Fox matchup with varying, strong priors.]{Modeling the Marth-Fox matchup with varying, strong priors.}
 \label{fig:posterior_beta_priors_varying_matchup_winrate_and_strength}
 \end{figure}
-\indent As can be seen in these graphs, the expected win rate of Marth against Fox is greatly impacted by the observed data ($\approx$270,000 matches observed). This makes sense because the posterior distribution parameters will be greatly influenced by the likelihood. Thus, in the case of a large data sample like this, the impact of the priors, regardless of perceived strength, is rendered nearly meaningless due to the sheer amount of observed data there is. However, for cases of uncommon matchups, where there may not be a lot of available data, the Bayesian model will allow our prior to be incorporated into the posterior to a greater degree. Below are graphs of the posterior when, in a hypothetical sample of 10 Marth-Fox matches, Marth wins 8 of them.
+\indent As shown in these graphs, the expected win rate of Marth against Fox is greatly impacted by the observed data ($\approx$270,000 matches observed). This makes sense because the posterior distribution parameters will be greatly influenced by the likelihood. Thus, in the case of a large data sample like this, the impact of the priors, regardless of perceived strength, is rendered nearly meaningless due to the sheer amount of observed data. However, for cases of uncommon matchups, where there may not be a lot of available data, the Bayesian model will allow our prior distribution to be incorporated into the posterior to a greater degree. Below are graphs of the posterior when, in a hypothetical sample of 10 Marth-Fox matches, Marth wins 8 of them.
 \begin{figure}[H]
 \center\includegraphics[width=0.8\textwidth]{figures/posterior_beta_priors_sample_data.png}
-\caption[Modeling a different Marth-Fox expected win rates given an even (50/50) matchup prior using sample data.]{Modeling a different Marth-Fox expected win rates given an even (50/50) matchup prior using sample data.}
+\caption[Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths using sample data.]{Modeling the Marth-Fox matchup using an even (50/50) prior with varying strengths using sample data.}
 \label{fig:posterior_beta_priors_sample_data}
 \end{figure}
 \begin{figure}[H]
@@ -38,14 +38,14 @@ For the first model, we will approach it completely analytically. We will model 
 \caption[Modeling a different Marth-Fox expected win rates given varying matchup priors of similar strength using sample data.]{Modeling a different Marth-Fox expected win rates given varying matchup priors of similar stregth using sample data.}
 \label{fig:posterior_different_beta_priors_sample_data}
 \end{figure}
-\indent Looking at the above figures, it is more evident how changing a prior's strength or shape will affect the posterior distribution. Again, in the case of Melee, given $n=26$ characters, there are $\frac{n(n+1)}{2}=\frac{26\cdot27}{2}=351$ total unique matchups. By leveraging a Bayesian approach, we can more accurately model matchup probabilities for characters with significantly lower use rate in competitive settings.
+\indent Looking at the above figures, it is more evident how changing a prior's strength or shape will affect the posterior distribution. Again, in the case of Melee, given $n=26$ characters, there are $\frac{n(n+1)}{2}=\frac{26\cdot27}{2}=351$ total unique matchups. By leveraging a Bayesian approach, we can more accurately model matchup probabilities for characters with significantly lower usage in competitive settings.
 
 \indent Although this is a good exercise and a simple way to use Bayesian methods to better model matchups in Melee, there are several components not included in this initial model. First, as previously explained, stages in Melee often make a difference in a matchup. In the Marth-Fox matchup, it is argued that Final Destination is a strong choice for Marth due to him gaining access to techniques not available on stages with platforms. Thus, we are interested in also understanding character matchups by stage. Second, it is likely that not all of the observed matches were against evenly matched players. We may want to design a model that factors in player skill when trying to determine the true matchup spread.
 
 \section{Model 2: Marth-Fox Matchup by Stage}
 In competitive Melee, there are 6 tournament-legal stages: Battlefield, Final Destination, Dream Land, Fountain of Dreams, Pokemon Stadium, and Yoshi's Story. We are interested in understanding how the Marth-Fox matchup varies by stage. In competitive Melee, before a set begins, players will go through a process known as ``stage striking'', in which players take turns removing a stage from being selected until there is only one remaining \citep{SmashWiki_StageStriking}. It is important for a player to understand how their character performs on each stage in a given matchup when deciding which stages to strike.
 
-\indent To determine if there is a significant effect a stage has on the Marth-Fox matchup, we can utilize a logistic regression model. This fits since the response data (a match win or loss) is binary in nature. We define our model in the following way:
+\indent To determine if there is a significant effect a stage has on the Marth-Fox matchup, we can utilize a logistic regression model. This fits since the response data (a match win or loss) is binary in nature. We define our model as
 \begin{align*}
     y_i|p_i\sim\text{Bernoulli}(p_i), i=1,\dots,6\\
     \text{logit}(p_i) = \alpha+\gamma_iy_i\\
@@ -53,7 +53,7 @@ In competitive Melee, there are 6 tournament-legal stages: Battlefield, Final De
     \gamma_i\sim N(0, 10)\\
     \sum\gamma_i = 0
 \end{align*}
-Where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. As a note, to speed up the model, only a subset of the full corpus of data was used (10,000 matches), which contributes to the difference in values than may have been calculated in the previous section. Below are the summary statistics for this model using a 95\% HDI credible interval:
+where $\alpha$ represents the base ``matchup effect'' and $\gamma_i$ represents the ``stage effect'' on the matchup probability. A positive value for these values indicates a favorable matchup for Marth, either generally, or given a particular stage. As a note, to speed up the model, only a subset of the full corpus of data was used (10,000 matches), which contributes to the difference in values than may have been calculated in the previous section. Below are the summary statistics for this model using a 95\% HDI credible interval:
 \\\\
 \resizebox{\textwidth}{!}{
 \begin{tabular}{lrrrrrrrrr}
@@ -73,9 +73,9 @@ gamma[DREAMLAND] & -0.070 & 0.046 & -0.161 & 0.017 & 0.001 & 0.001 & 5253.000 & 
 \\\\
 Looking at this data, we see that the credible interval for $\alpha$ does not cross 0. This implies that, disregarding any additional stage factor, Marth is likely to have a losing matchup against Fox. Specifically, when converting the log-odds to a probability, we estimate the base probability of Marth winning against Fox to be approximately 42.9\%. This contradicts both the assumption that the matchup is even, or the possibility that the matchup is in Marth's favor.
 
-Analyzing the $\gamma_i$ values, we can analyze what stages could be beneficial for Marth. Yoshi's Story appears to be the only stage where we can conclusively determine (given the 95\% HDI credible interval) that it is more likely that Marth will win on this stage. While not conclusive, Final Destination appears to be in Marth's favor. Similarly, Dream Land and Pokemon Stadium appear to lean in Fox's favor, although this is also not conclusive. Battlefield and Fountain of Dreams appear to be relatively even for both characters. Given this data, a Marth player's choice for stage bans or selections can be more strongly statistically supported.
+Analyzing the $\gamma_i$ values, we can determine what stages could be beneficial for Marth. Yoshi's Story appears to be the only stage in which we can conclusively determine (given the 95\% HDI credible interval) that it is more likely that Marth will win. While not conclusive, Final Destination appears to be in Marth's favor. Similarly, Dream Land and Pokemon Stadium appear to lean in Fox's favor, although this is also not conclusive. Battlefield and Fountain of Dreams appear to be relatively even for both characters. Given this data, a Marth player's choice for stage bans or selections can be more strongly statistically supported.
 
-We also can conduct a hypothesis test to see if the belief that the matchup being 60/40 in Marth's favor holds any merit. We can do this by checking if $\text{invlogit}(\alpha) >= 0.6$ for each sampled $\alpha$ in the chain. When performing this test, we get the following output:
+We also can conduct a hypothesis test to see if the belief that the matchup being 60/40 in Marth's favor holds any merit. We can do this by checking if $\text{invlogit}(\alpha) >= 0.6$ for each sampled $\alpha$ in the chain. The resulting data of this hypothesis test is as follows:
 \\\\
 \resizebox{\textwidth}{!}{
 \begin{tabular}{lrrrrrrrrr}
@@ -174,4 +174,4 @@ Looking at the data for $\beta$, it appears that a difference in Slippi rating h
 
 \indent For the $\alpha$ and $\gamma_i$ parameters, little has changed, also likely due to $\beta$ having little impact on the matchup. While the matchup factor would likely remain the same, I would expect the stage effects to potentially diverge as skill difference is accounted for.
 
-\indent Although there is no substantial conclusion on if player ratings impact the Marth-Fox matchup in this example, this model provides the foundation to perform similar analysis in the future if match data containing player ratings is available.
+\indent Although there is no substantial conclusion on player ratings impacting the Marth-Fox matchup in this example, this model provides the foundation to perform similar analysis in the future if match data containing player ratings is available.
